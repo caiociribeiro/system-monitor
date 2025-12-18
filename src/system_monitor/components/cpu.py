@@ -16,10 +16,11 @@ class CPU:
         self.sensor: str | None = None
         self.temp: Metric = Metric("temp", "°C")
         self.clocks: list[Metric] = []
-        self._detected = False
+        self._cpu_detected = False
+        self._clocks_detected = False
 
     def update(self, sensors: dict) -> None:
-        if not self._detected:
+        if not self._cpu_detected:
             self._detect_cpu()
 
         if self.vendor == "AMD":
@@ -41,7 +42,7 @@ class CPU:
         elif "Intel" in self.vendor:
             self.vendor = "Intel"
 
-        self._detected = True
+        self._cpu_detected = True
 
     def _update_amd(self, sensors: dict) -> None:
         for key, value in sensors.items():
@@ -62,15 +63,15 @@ class CPU:
                 if line.lower().startswith("cpu mhz"):
                     clocks.append(float(line.split(":")[1].strip()))
 
-        if not self._detected:
-            for i, mhz in enumerate(clocks):
-                metric = Metric(f"clock_core_{i}", "MHz")
-                metric.update(mhz)
+        if not self._clocks_detected:
+            for i, clock in enumerate(clocks):
+                metric = Metric(f"CPU #{i}", "MHz")
+                metric.update(clock)
                 self.clocks.append(metric)
 
-            self._detected = True
+            self._clocks_detected = True
             return
 
-        for metric, mhz in zip(self.clocks, clocks):
-            metric.update(mhz)
+        for metric, clock in zip(self.clocks, clocks):
+            metric.update(clock)
 

@@ -14,9 +14,9 @@ def build_table(cpu, nvme, ram, gpu) -> Group:
     table = Table(box=box.ASCII2, expand=False)
 
     table.add_column("Sensor", width=40, no_wrap=True)
-    table.add_column("Current", width=10, justify="right")
-    table.add_column("Min", width=10, justify="right")
-    table.add_column("Max", width=10, justify="right")
+    table.add_column("Current", width=15, justify="right")
+    table.add_column("Min", width=15, justify="right")
+    table.add_column("Max", width=15, justify="right")
 
     # CPU
     table.add_row(cpu.name)
@@ -26,12 +26,14 @@ def build_table(cpu, nvme, ram, gpu) -> Group:
         fmt_metric(cpu.temp.min, cpu.temp.unit),
         fmt_metric(cpu.temp.max, cpu.temp.unit),
     )
-    for i in range(0, len(cpu.clocks)):
+
+    table.add_row("   Clocks")
+    for i, clock in enumerate(cpu.clocks):
         table.add_row(
-            f"   {cpu.clocks[i].name}",
-            fmt_metric(cpu.clocks[i].current, cpu.clocks[i].unit),
-            fmt_metric(cpu.clocks[i].min, cpu.clocks[i].unit),
-            fmt_metric(cpu.clocks[i].max, cpu.clocks[i].unit),
+            f"   └─ {clock.name}" if i == 0 else f"      {clock.name}",
+            fmt_metric(clock.current, f" {clock.unit}"),
+            fmt_metric(clock.min, f" {clock.unit}"),
+            fmt_metric(clock.max, f" {clock.unit}"),
         )
 
     for i in range(len(nvme.devices)):
