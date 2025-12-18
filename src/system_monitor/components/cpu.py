@@ -15,6 +15,7 @@ class CPU:
         self.vendor: str = "Unknown"
         self.sensor: str | None = None
         self.temp: Metric = Metric("temp", "°C")
+        self.clocks: list[Metric] = []
         self._detected = False
 
     def update(self, sensors: dict) -> None:
@@ -25,6 +26,8 @@ class CPU:
             self._update_amd(sensors)
         elif self.vendor == "Intel":
             self._update_intel(sensors)
+
+        self._update_clock()
 
     def _detect_cpu(self) -> None:
         data = subprocess.check_output(["lscpu", "-J"])
@@ -51,4 +54,23 @@ class CPU:
     def _update_intel(self, sensors: dict) -> None:
         pass
 
+    def _update_clock(self) -> None:
+        clocks: list[float] = []
+
+        with open("/proc/cpuinfo") as f:
+            for line in f:
+                if line.lower().startswith("cpu mhz"):
+                    clocks.append(float(line.split(":")[1].strip()))
+
+        if not self._detected:
+            for i, mhz in enumerate(clocks):
+                metric = Metric(f"clock_core_{i}", "MHz")
+                metric.update(mhz)
+                self.clocks.append(metric)
+
+            self._detected = True
+            return
+
+        for metric, mhz in zip(self.clocks, clocks):
+            metric.update(mhz)
 

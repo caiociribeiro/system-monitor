@@ -1,9 +1,8 @@
 from rich.table import Table
-
-CELSIUS = "°C"
-SEPARATOR = "-" * 10
-
-
+from rich.panel import Panel
+from rich.align import Align
+from rich.console import Group
+from rich import box
 
 def fmt_metric(metric: float | None, unit: str) -> str:
     if metric is None:
@@ -11,8 +10,8 @@ def fmt_metric(metric: float | None, unit: str) -> str:
     return f"{metric:6.2f}{unit}"
 
 
-def build_table(cpu, nvme, ram, gpu) -> Table:
-    table = Table(expand=False)
+def build_table(cpu, nvme, ram, gpu) -> Group:
+    table = Table(box=box.ASCII2, expand=False)
 
     table.add_column("Sensor", width=40, no_wrap=True)
     table.add_column("Current", width=10, justify="right")
@@ -20,17 +19,24 @@ def build_table(cpu, nvme, ram, gpu) -> Table:
     table.add_column("Max", width=10, justify="right")
 
     # CPU
-    table.add_row(cpu.name, SEPARATOR, SEPARATOR, SEPARATOR)
+    table.add_row(cpu.name)
     table.add_row(
         f"└─ Temp ({cpu.sensor})",
         fmt_metric(cpu.temp.current, cpu.temp.unit),
         fmt_metric(cpu.temp.min, cpu.temp.unit),
         fmt_metric(cpu.temp.max, cpu.temp.unit),
     )
+    for i in range(0, len(cpu.clocks)):
+        table.add_row(
+            f"   {cpu.clocks[i].name}",
+            fmt_metric(cpu.clocks[i].current, cpu.clocks[i].unit),
+            fmt_metric(cpu.clocks[i].min, cpu.clocks[i].unit),
+            fmt_metric(cpu.clocks[i].max, cpu.clocks[i].unit),
+        )
 
     for i in range(len(nvme.devices)):
         table.add_row()
-        table.add_row(f"NVME #{i} - {nvme.devices[i].sensor}", SEPARATOR, SEPARATOR, SEPARATOR)
+        table.add_row(f"NVME #{i} - {nvme.devices[i].sensor}")
         table.add_row(
             "└─ Temp",
             fmt_metric(nvme.devices[i].temp.current, nvme.devices[i].temp.unit),
@@ -40,7 +46,7 @@ def build_table(cpu, nvme, ram, gpu) -> Table:
 
     for i in range(len(ram.devices)):
         table.add_row()
-        table.add_row(f"DIMM #{i} - {ram.devices[i].sensor}", SEPARATOR, SEPARATOR, SEPARATOR)
+        table.add_row(f"DIMM #{i} - {ram.devices[i].sensor}")
         table.add_row(
             "└─ Temp",
             fmt_metric(ram.devices[i].temp.current, ram.devices[i].temp.unit),
@@ -51,7 +57,7 @@ def build_table(cpu, nvme, ram, gpu) -> Table:
     table.add_row()
 
     if gpu.temp is not None:
-        table.add_row(gpu.name, SEPARATOR, SEPARATOR, SEPARATOR)
+        table.add_row(gpu.name)
         table.add_row(
             "└─ Temp",
             fmt_metric(gpu.temp.current, gpu.temp.unit),
@@ -59,4 +65,10 @@ def build_table(cpu, nvme, ram, gpu) -> Table:
             fmt_metric(gpu.temp.max, gpu.temp.unit),
         )
 
-    return table
+    footer = Panel(
+            Align.left("[bold]Ctrl+c[/bold] to quit"),
+            box=box.SIMPLE,
+            width=80
+        )
+
+    return Group(table, footer)

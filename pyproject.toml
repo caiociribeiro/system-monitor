@@ -1,6 +1,14 @@
 [project]
 name = "system-monitor"
 version = "0.1.0"
+description = "System's sensors monitor using Rich"
+requires-python = ">=3.10"
+dependencies = [
+  "rich"
+]
+
+[project.scripts]
+smonitor = "system_monitor.main:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
