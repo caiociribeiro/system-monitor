@@ -6,9 +6,8 @@ from rich import box
 
 def fmt_metric(metric: float | None, unit: str) -> str:
     if metric is None:
-        return "Unknown"
+        return "?"
     return f"{metric:6.2f}{unit}"
-
 
 def build_table(cpu, nvme, ram, gpu) -> Group:
     table = Table(box=box.ASCII2, expand=False)
@@ -36,24 +35,24 @@ def build_table(cpu, nvme, ram, gpu) -> Group:
             fmt_metric(clock.max, f" {clock.unit}"),
         )
 
-    for i in range(len(nvme.devices)):
+    for i, dev in enumerate(nvme.devices):
         table.add_row()
         table.add_row(f"NVME #{i} - {nvme.devices[i].sensor}")
         table.add_row(
             "└─ Temp",
-            fmt_metric(nvme.devices[i].temp.current, nvme.devices[i].temp.unit),
-            fmt_metric(nvme.devices[i].temp.min, nvme.devices[i].temp.unit),
-            fmt_metric(nvme.devices[i].temp.max, nvme.devices[i].temp.unit),
+            fmt_metric(dev.temp.current, dev.temp.unit),
+            fmt_metric(dev.temp.min, dev.temp.unit),
+            fmt_metric(dev.temp.max, dev.temp.unit),
         )
 
-    for i in range(len(ram.devices)):
+    for i, dev in enumerate(ram.devices):
         table.add_row()
         table.add_row(f"DIMM #{i} - {ram.devices[i].sensor}")
         table.add_row(
             "└─ Temp",
-            fmt_metric(ram.devices[i].temp.current, ram.devices[i].temp.unit),
-            fmt_metric(ram.devices[i].temp.min, ram.devices[i].temp.unit),
-            fmt_metric(ram.devices[i].temp.max, ram.devices[i].temp.unit),
+            fmt_metric(dev.temp.current, dev.temp.unit),
+            fmt_metric(dev.temp.min, dev.temp.unit),
+            fmt_metric(dev.temp.max, dev.temp.unit),
         )
 
     table.add_row()
