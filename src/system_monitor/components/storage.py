@@ -1,4 +1,3 @@
-import os
 import subprocess
 import json
 from system_monitor.core.metric import Metric
@@ -47,9 +46,6 @@ class STORAGE:
             self.devices.append(device)
 
         self._detected = True
-
-    def _get_nvme_sensor_keys(self, sensors: dict) -> list[str]:
-        return [k for k in sensors.keys() if k.startswith("nvme-pci")]
 
     def _read_smart_temp(self, devnode: str) -> float | None:
         try:
