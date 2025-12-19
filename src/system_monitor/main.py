@@ -2,7 +2,7 @@ import time
 from threading import Event
 from rich.live import Live
 
-from system_monitor import CPU, GPU, NVME, RAM, SensorProvider, build_table
+from system_monitor import CPU, GPU, STORAGE, RAM, SensorProvider, build_table
 
 REFRESH_RATE = 1.0
 
@@ -13,7 +13,7 @@ def main() -> None:
 
     cpu = CPU()
     gpu = GPU()
-    nvme = NVME()
+    storage = STORAGE()
     ram = RAM()
 
     try:
@@ -22,12 +22,12 @@ def main() -> None:
                 sensors = provider.read()
 
                 cpu.update(sensors)
-                nvme.update(sensors)
+                storage.update(sensors)
                 ram.update(sensors)
                 gpu.update()
 
 
-                table = build_table(cpu, nvme, ram, gpu)
+                table = build_table(cpu, storage, ram, gpu)
                 live.update(table)
 
                 time.sleep(REFRESH_RATE)

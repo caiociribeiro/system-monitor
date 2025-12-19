@@ -47,7 +47,7 @@ class CPU:
     def _update_amd(self, sensors: dict) -> None:
         for key, value in sensors.items():
             if key.startswith(_AMD_PREFIX):
-                self.sensor = _AMD_CPU_MAIN_SENSOR
+                self.sensor = f"CPU ({_AMD_CPU_MAIN_SENSOR})"
                 self.temp.update(next(iter(value[_AMD_CPU_MAIN_SENSOR].values())))
                 return
 
@@ -65,7 +65,7 @@ class CPU:
 
         if not self._clocks_detected:
             for i, clock in enumerate(clocks):
-                metric = Metric(f"CPU #{i}", "MHz")
+                metric = Metric(f"Core #{i}", "MHz")
                 metric.update(clock)
                 self.clocks.append(metric)
 

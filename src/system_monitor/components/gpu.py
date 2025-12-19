@@ -1,6 +1,8 @@
 import subprocess
 from system_monitor.core.metric import Metric
 
+# TODO: add support for intel and AMD
+
 class GPU:
     def __init__(self) -> None:
         self.manufacturer: str = "Unknown"
