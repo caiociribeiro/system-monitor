@@ -41,8 +41,6 @@ def build_table(cpu, storage, ram, gpu) -> Group:
         fmt_metric(cpu.temp.max, cpu.temp.unit),
     )
 
-    table.add_row()
-
     table.add_row("|- Clocks")
     for i, clock in enumerate(cpu.clocks):
         table.add_row(
@@ -85,7 +83,7 @@ def build_table(cpu, storage, ram, gpu) -> Group:
         )
 
     footer = Panel(
-            Align.left("[bold]Ctrl+c[/bold] to quit"),
+            Align.left("Press [bold]ctrl+c[/bold] to quit"),
             box=box.SIMPLE,
             width=80
         )
